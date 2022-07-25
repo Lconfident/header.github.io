@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>北北的个人主页</title>
+    <meta name="description" content="北北的个人主页">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="page-menu.css">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond&display=swap">
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+</head>
+
+<script>
+    //时间控制
+    window.addEventListener("DOMContentLoaded", () => {
+        const clock = new BouncyBlockClock(".clock");
+    });
+
+    class BouncyBlockClock {
+        constructor(qs) {
+            this.el = document.querySelector(qs);
+            this.time = { a: [], b: [] };
+            this.rollClass = "clock__block--bounce";
+            this.digitsTimeout = null;
+            this.rollTimeout = null;
+            this.mod = 0 * 60 * 1000;
+
+            this.loop();
+        }
+        animateDigits() {
+            const groups = this.el.querySelectorAll("[data-time-group]");
+
+            Array.from(groups).forEach((group, i) => {
+                const { a, b } = this.time;
+
+                if (a[i] !== b[i]) group.classList.add(this.rollClass);
+            });
+
+            clearTimeout(this.rollTimeout);
+            this.rollTimeout = setTimeout(this.removeAnimations.bind(this), 900);
+        }
+        displayTime() {
+            // screen reader time
+            const timeDigits = [...this.time.b];
+            const ap = timeDigits.pop();
+
+            this.el.ariaLabel = `${timeDigits.join(":")} ${ap}`;
+
+            // displayed time
+            Object.keys(this.time).forEach(letter => {
+                const letterEls = this.el.querySelectorAll(`[data-time="${letter}"]`);
+
+                Array.from(letterEls).forEach((el, i) => {
+                    el.textContent = this.time[letter][i];
+                });
+            });
+        }
+        loop() {
+            this.updateTime();
+            this.displayTime();
+            this.animateDigits();
+            this.tick();
+        }
+        removeAnimations() {
+            const groups = this.el.querySelectorAll("[data-time-group]");
+
+            Array.from(groups).forEach(group => {
+                group.classList.remove(this.rollClass);
+            });
+        }
+        tick() {
+            clearTimeout(this.digitsTimeout);
+            this.digitsTimeout = setTimeout(this.loop.bind(this), 1e3);
+        }
+        updateTime() {
+            const rawDate = new Date();
+            const date = new Date(Math.ceil(rawDate.getTime() / 1e3) * 1e3 + this.mod);
+            let h = date.getHours();
+            const m = date.getMinutes();
+            const s = date.getSeconds();
+            const ap = h < 12 ? "AM" : "PM";
+
+            if (h === 0) h = 12;
+            if (h > 12) h -= 12;
+
+            this.time.a = [...this.time.b];
+            this.time.b = [
+                (h < 10 ? `0${h}` : `${h}`),
+                (m < 10 ? `0${m}` : `${m}`),
+                (s < 10 ? `0${s}` : `${s}`),
+                ap
+            ];
+
+            if (!this.time.a.length) this.time.a = [...this.time.b];
+        }
+    }
+    //时间控制
+</script>
+
+<body style="position: static;">
+    <div class="page" id="body-wrap">
+        <header class="full_page" id="page-header" style="background-image: url('https://api.dujin.org/bing/1920.php')">
+            <nav id="nav" class="show">
+                <div id="blog-name">
+                    <a id="site-name" href="https://cn.bing.com/" target="_self">北北的个人主页</a>
+                </div>
+            </nav>
+            <div id="clock" class="clock" aria-label="00:00:00 AM">
+                <div class="clock__block clock__block--delay2" aria-hidden="true" data-time-group>
+                    <div class="clock__digit-group">
+                        <div class="clock__digits" data-time="a">00</div>
+                        <div class="clock__digits" data-time="b">00</div>
+                    </div>
+                </div>
+                <div class="clock__colon"></div>
+                <div class="clock__block clock__block--delay1" aria-hidden="true" data-time-group>
+                    <div class="clock__digit-group">
+                        <div class="clock__digits" data-time="a">00</div>
+                        <div class="clock__digits" data-time="b">00</div>
+                    </div>
+                </div>
+                <div class="clock__colon"></div>
+                <div class="clock__block" aria-hidden="true" data-time-group>
+                    <div class="clock__digit-group">
+                        <div class="clock__digits" data-time="a">00</div>
+                        <div class="clock__digits" data-time="b">00</div>
+                    </div>
+                </div>
+                <div class="clock__block clock__block--delay2 clock__block--small" aria-hidden="true" data-time-group>
+                    <div class="clock__digit-group">
+                        <div class="clock__digits" data-time="a">PM</div>
+                        <div class="clock__digits" data-time="b">AM</div>
+                    </div>
+                </div>
+            </div>
+            <div id="site-info">
+                <h1 id="site-title" class="site-info-title">北北的个人主页</h1>
+                <h2 id="site-title-motto">经不住似水流年，逃不过此间少年</h2>
+            </div>
+            <div id="scroll-down">
+                <h2 id="scroll-down-title" class="site-info-title">SCROLL DOWN</h2>
+                <i id="scroll-down-icon" class="fa fa-angle-down sroll-down-effects"></i>
+            </div>
+        </header>
+        <main id="flex-container" class="layout">
+            <div class="flex-slide home">
+                <a href="https://lconfident.github.io/HomePage.github.io/" target="_blank">
+                <div class="flex-title flex-title-home">Home</div>
+                <div class="flex-about flex-about-home">
+                    <p>Click here to navigate to the home section of the weebsite</p>
+                </div></a>
+            </div>
+            <div class="flex-slide book">
+                <a href="https://lconfident.github.io/BookPage.github.io/" target="_blank">
+                <div class="flex-title flex-title-book">Book</div>
+                <div class="flex-about flex-about-bok">
+                    <p>Click here to navigate to the book section of the website</p>
+                </div></a>
+            </div>
+            <div class="flex-slide work">
+                <a href="https://lconfident.github.io/WorkPage.github.io/" target="_blank">
+                <div class="flex-title flex-title-work">Work</div>
+                <div class="flex-about flex-about-work">
+                    <p>Click here to navigate to the work section of the website</p>
+                </div></a>
+            </div>
+            <div class="flex-slide about">
+                <a href="https://lconfident.github.io/AboutPage.github.io/" target="_blank">
+                <div class="flex-title flex-title-about">About</div>
+                <div class="flex-about flex-about-about">
+                    <p>Click here to navigate to the about section of the website</p>
+                </div></a>
+            </div>
+        </main>
+        <script>
+            //菜单页动画，jQuery语法
+            (function () {
+                $(".flex-slide").each(function () {
+                    $(this).hover(function () {
+                        $(this).find('.flex-title').css({
+                            transform: 'rotate(0deg)',
+                            top: '10%'
+                        });
+                        $(this).find('.flex-about').css({
+                            opacity: '1'
+                        });
+                    }, function () {
+                        $(this).find('.flex-title').css({
+                            transform: 'rotate(90deg)',
+                            top: '15%'
+                        });
+                        $(this).find('.flex-about').css({
+                            opacity: '0'
+                        });
+                    })
+                });
+            })();
+            //菜单页动画
+        </script>
+    </div>
+</body>
+
+</html>
